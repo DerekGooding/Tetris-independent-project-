@@ -1,4 +1,6 @@
-﻿namespace Tetris.blocks;
+﻿using System;
+
+namespace Tetris.blocks;
 
 public static class Tetrominos
 {
@@ -26,7 +28,6 @@ public static class Tetrominos
 
     private static Tetromino _currentPiece;
     private static Position _positionOfPiece;
-    private const int _boardWidth = 10, _boardHeight = 20;
     private static bool _gameOver;
     public static bool Pause { get; set; }
 
@@ -36,7 +37,7 @@ public static class Tetrominos
         {
             var x = _positionOfPiece.X + p.X + dx;
             var y = _positionOfPiece.Y + p.Y + dy;
-            if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
+            if (x < 0 || x >= Grid.Width || y < 0 || y >= Grid.Height || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
         return true;
@@ -45,7 +46,7 @@ public static class Tetrominos
     public static void NewPiece()
     {
         _currentPiece = PiecesPool[Random.Shared.Next(PiecesPool.Length)];
-        _positionOfPiece = new(_boardWidth / 2, 0);
+        _positionOfPiece = new(Grid.Width / 2, 0);
         if (!CanMove(0, 0)) _gameOver = true;
     }
 
@@ -86,7 +87,7 @@ public static class Tetrominos
         {
             var x = _positionOfPiece.X + px;
             var y = _positionOfPiece.Y + py;
-            if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
+            if (x < 0 || x >= Grid.Width || y < 0 || y >= Grid.Height || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
         return true;
@@ -110,18 +111,18 @@ public static class Tetrominos
         ForegroundColor = ConsoleColor.White;
 
         SetCursorPosition(startX, startY);
-        Write("╔" + new string('═', _boardWidth) + "╗");
+        Write("╔" + new string('═', Grid.Width) + "╗");
 
-        for (var i = 0; i < _boardHeight; i++)
+        for (var i = 0; i < Grid.Height; i++)
         {
             SetCursorPosition(startX, startY + i + 1);
             Write("║");
-            SetCursorPosition(startX + _boardWidth + 1, startY + i + 1);
+            SetCursorPosition(startX + Grid.Width + 1, startY + i + 1);
             Write("║");
         }
 
-        SetCursorPosition(startX, startY + _boardHeight + 1);
-        Write("╚" + new string('═', _boardWidth) + "╝");
+        SetCursorPosition(startX, startY + Grid.Height + 1);
+        Write("╚" + new string('═', Grid.Width) + "╝");
 
         ResetColor();
     }
@@ -131,10 +132,10 @@ public static class Tetrominos
         DrawBorder();
         SetCursorPosition(0, 0);
 
-        for (var y = 0; y < _boardHeight; y++)
+        for (var y = 0; y < Grid.Height; y++)
         {
             SetCursorPosition(1, y + 1);
-            for (var x = 0; x < _boardWidth; x++)
+            for (var x = 0; x < Grid.Width; x++)
 
             {
                 var isPiece = false;
@@ -159,7 +160,7 @@ public static class Tetrominos
 
             WriteLine();
         }
-        const int textX = _boardWidth + 4;
+        const int textX = Grid.Width + 4;
         const int textY = 2;
         ResetColor();
         WriteLine();
