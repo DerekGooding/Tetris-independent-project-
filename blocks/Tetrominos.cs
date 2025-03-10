@@ -41,9 +41,7 @@ public static class Tetrominos
         return true;
     }
 
-    public static void NewPiece()       //picks a random array from the array
-                                        //and positions it at the top and center of the board
-                                        //if it hits zero it starts over
+    public static void NewPiece()
     {
         _currentPiece = PiecesPool[Random.Shared.Next(PiecesPool.Length)];
         _positionOfPiece = new(_boardWidth / 2, 0);
@@ -66,9 +64,9 @@ public static class Tetrominos
         }
     }
 
-    public static void MovePiece(int dx, int dy)        //this just determines if the piece can move or if its set
-    {                                                   //if it CanMove, it accepts inputs and adds them to change the position of the piece (dx = horizontal movement of piece, dy vertical movement of piece)
-        if (CanMove(dx, dy))                            //if not, it places the piece, checks for full rows, then initiates a new piece
+    public static void MovePiece(int dx, int dy)
+    {
+        if (CanMove(dx, dy))
         {
             _positionOfPiece.X += dx;
             _positionOfPiece.Y += dy;
@@ -100,7 +98,7 @@ public static class Tetrominos
             .ToArray();
 
         if (CanRotate(rotatedPiece))
-            _currentPiece = new(_currentPiece.Name, rotatedPiece, _currentPiece.Color);
+            _currentPiece.Postions = rotatedPiece;
     }
 
     private static void DrawBorder()
@@ -127,15 +125,14 @@ public static class Tetrominos
         ResetColor();
     }
 
-    public static void DrawBoard()                  //wrote about half of this, got some help with the part that determines where the piece is.
-                                                    //this draws the gameboard and checks if the grid is currently occupied by a piece
+    public static void DrawBoard()
     {
         DrawBorder();
         SetCursorPosition(0, 0);
 
-        for (var y = 0; y < _boardHeight; y++)            //uses a bool to check cells for a piece, if it does it registers true it draws an x
+        for (var y = 0; y < _boardHeight; y++)
         {
-            SetCursorPosition(1, y + 1); //otherwise it does . for empty space
+            SetCursorPosition(1, y + 1);
             for (var x = 0; x < _boardWidth; x++)
 
             {
@@ -213,9 +210,9 @@ public static class Tetrominos
 
     public static bool Pause { get; set; }
 
-    public static void ReadInput()              //this is for inputs that determine how the piece move
-    {                                           //currently i have an up input just so i can play around with it
-        while (!_gameOver)                       //later i'll change that
+    public static void ReadInput()
+    {
+        while (!_gameOver)
         {
             var key = ReadKey(true).Key;
 
