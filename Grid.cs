@@ -4,9 +4,9 @@ namespace Tetris;
 
 public class Grid
 {
-    public static int Width { get; set; } = 20;
-    public static int Height { get; set; } = 10;
-    public static int[,] NewGrid { get; } = new int[Width, Height];
+    public const int Height = 20;
+    public const int Width  = 10;
+    public static int[,] NewGrid { get; } = new int[Height, Width];
     public static ConsoleColor[,] ColorGrid { get; } = new ConsoleColor[20, 10];
 
     public Position? StartPoint;
@@ -21,7 +21,7 @@ public class Grid
 
     public Position Start
     {
-        get => new(Width = 10 / 2, Height = 20);
+        get => new(10 / 2, 20);
         set => StartPoint = value;
     }
 
@@ -31,13 +31,13 @@ public class Grid
         set => NewPiece = value;
     }
 
-    public static bool IsCellEmpty(int w, int h) => NewGrid[w, h] == 0;
+    public static bool IsCellEmpty(int h, int w) => NewGrid[h, w] == 0;
 
-    public static bool IsRowFull(int w)
+    public static bool IsRowFull(int h)
     {
-        for (var h = 0; h < Height; h++)
+        for (var w = 0; w < Width; w++)
         {
-            if (NewGrid[w, h] == 0)
+            if (NewGrid[h, w] == 0)
             {
                 return false;
             }
@@ -45,11 +45,11 @@ public class Grid
         return true;
     }
 
-    public static bool IsRowEmpty(int w)
+    public static bool IsRowEmpty(int h)
     {
-        for (var h = 0; h < Height; h++)
+        for (var w = 0; w < Width; w++)
         {
-            if (NewGrid[w, h] != 0)
+            if (NewGrid[h, w] != 0)
             {
                 return false;
             }
@@ -57,13 +57,13 @@ public class Grid
         return true;
     }
 
-    public static void ClearRow(int w)
+    public static void ClearRow(int h)
     {
-        if (IsRowFull(w))
+        if (IsRowFull(h))
         {
-            for (var h = 0; h < Height; h++)
+            for (var w = 0; w < Width; w++)
             {
-                NewGrid[w, h] = 0;
+                NewGrid[h, w] = 0;
             }
 
             Score++;
@@ -72,21 +72,21 @@ public class Grid
 
     public static void ClearBoard()
     {
-        for (var h = 0; h < Width; h++)
+        for (var h = 0; h < Height; h++)
         {
-            for (var w = 0; w < Height; w++)
+            for (var w = 0; w < Width; w++)
             {
                 NewGrid[h, w] = 0;
             }
         }
     }
 
-    public static void RowDown(int w, int rowNumber)
+    public static void RowDown(int h, int rowNumber)
     {
-        for (var h = 0; h < Height; h++)
+        for (var w = 0; w < Width; w++)
         {
-            NewGrid[w + rowNumber, h] = NewGrid[w, h];
-            NewGrid[w, h] = 0;
+            NewGrid[h + rowNumber, w] = NewGrid[h, w];
+            NewGrid[h, w] = 0;
         }
     }
 
@@ -94,16 +94,16 @@ public class Grid
     {
         var clear = 0;
 
-        for (var w = Width - 1; w >= 0; w--)
+        for (var h = Height - 1; h >= 0; h--)
         {
-            if (IsRowFull(w))
+            if (IsRowFull(h))
             {
-                ClearRow(w);
+                ClearRow(h);
                 clear++;
             }
             else if (clear > 0)
             {
-                RowDown(w, clear);
+                RowDown(h, clear);
             }
         }
         return clear;
@@ -111,9 +111,9 @@ public class Grid
 
     public static bool IsGameOver()
     {
-        for (var h = 0; h < Height; h++)
+        for (var w = 0; w < Width; w++)
         {
-            if (NewGrid[0, h] != 0)
+            if (NewGrid[0, w] != 0)
             {
                 return true;
             }
