@@ -84,10 +84,7 @@ public static class Program
             _waveOut.Dispose();
             _audioFile?.Dispose();
         }
-
-        var projectDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
-
-        var musicDirectory = Path.Combine(projectDirectory, "Assets", "Audio");
+        var musicDirectory = Path.Combine("Assets", "Audio");
 
         var randomIndex = Random.Shared.Next(_playlist.Length);
         var filePath = Path.Combine(musicDirectory, _playlist[randomIndex]);
