@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "ConsoleHero/0.5.5": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/ConsoleHero.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/ConsoleHero.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.NETCore.Platforms/3.1.0": {
         "type": "package",
         "compile": {
@@ -186,6 +199,26 @@
     }
   },
   "libraries": {
+    "ConsoleHero/0.5.5": {
+      "sha512": "dxGmQJLW4lPH0DZjVq8+NaNys0ejLqzNjlbDIY8ltKayiUMxWTmdEkLFq7B0QQ+na9iEC6SPkNLb6OF5MwReaQ==",
+      "type": "package",
+      "path": "consolehero/0.5.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "analyzers/dotnet/cs/EnumSourceGenerator.dll",
+        "consolehero.0.5.5.nupkg.sha512",
+        "consolehero.nuspec",
+        "icon.png",
+        "lib/net7.0/ConsoleHero.dll",
+        "lib/net7.0/ConsoleHero.xml",
+        "lib/net8.0/ConsoleHero.dll",
+        "lib/net8.0/ConsoleHero.xml",
+        "lib/net9.0/ConsoleHero.dll",
+        "lib/net9.0/ConsoleHero.xml"
+      ]
+    },
     "Microsoft.NETCore.Platforms/3.1.0": {
       "sha512": "z7aeg8oHln2CuNulfhiLYxCVMPEwBl3rzicjvIX+4sUuCwvXw5oXQEtbiU2c0z4qYL5L3Kmx0mMA/+t/SbY67w==",
       "type": "package",
@@ -447,6 +480,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "ConsoleHero >= 0.5.5",
       "NAudio >= 2.2.1"
     ]
   },
@@ -501,6 +535,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "ConsoleHero": {
+            "target": "Package",
+            "version": "[0.5.5, )"
+          },
           "NAudio": {
             "target": "Package",
             "version": "[2.2.1, )"

@@ -28,6 +28,7 @@ public static class Tetrominos
     private static Position _positionOfPiece;
     private const int _boardWidth = 10, _boardHeight = 20;
     private static bool _gameOver;
+    public static bool Pause { get; set; }
 
     public static bool CanMove(int dx, int dy)
     {
@@ -165,50 +166,50 @@ public static class Tetrominos
         WriteLine($"  Score: {Grid.Score}");
         WriteLine("    _._     _,-'\"\"`-._\r\n     (,-.`._,'(       |\\`-/|\r\n         `-.-' \\ )-`( , o o)\r\n             `-    \\`_`\"'-");
 
-        SetCursorPosition(textX, textY); if (Grid.Score > 10)
+        if (Grid.Score > 10)
         {
+            SetCursorPosition(textX, textY);
             ForegroundColor = ConsoleColor.Cyan;
             WriteLine("Nice!");
         }
-        ForegroundColor = ConsoleColor.White;
-        SetCursorPosition(textX, textY + 2); if (Grid.Score > 20)
+
+        if (Grid.Score > 20)
         {
+            SetCursorPosition(textX, textY + 2);
             ForegroundColor = ConsoleColor.Green;
             WriteLine("Great job!");
         }
 
-        ForegroundColor = ConsoleColor.White;
-
-        SetCursorPosition(textX, textY + 4); if (Grid.Score > 30)
+        if (Grid.Score > 30)
         {
+            SetCursorPosition(textX, textY + 4);
             ForegroundColor = ConsoleColor.Red;
             WriteLine("Excellent!");
         }
-        ForegroundColor = ConsoleColor.White;
 
-        SetCursorPosition(textX, textY + 6); if (Grid.Score > 40)
+        if (Grid.Score > 40)
         {
+            SetCursorPosition(textX, textY + 6);
             ForegroundColor = ConsoleColor.Magenta;
             WriteLine("Fantastic!");
         }
-        ForegroundColor = ConsoleColor.White;
 
-        SetCursorPosition(textX, textY + 8); if (Grid.Score > 50)
+        if (Grid.Score > 50)
         {
+            SetCursorPosition(textX, textY + 8);
             ForegroundColor = ConsoleColor.Yellow;
             WriteLine("Increrdible!!");
         }
-        ForegroundColor = ConsoleColor.White;
 
-        SetCursorPosition(textX, textY + 10); if (Grid.Score > 60)
+        if (Grid.Score > 60)
         {
+            SetCursorPosition(textX, textY + 10);
             ForegroundColor = ConsoleColor.Blue;
             WriteLine("Out of this world!!");
         }
-        ForegroundColor = ConsoleColor.White;
-    }
 
-    public static bool Pause { get; set; }
+        ResetColor();
+    }
 
     public static void ReadInput()
     {
