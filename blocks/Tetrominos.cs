@@ -2,51 +2,39 @@
 
 public static class Tetrominos
 {
-    public static (int x, int y)[][] PiecesPool { get; } =
+    public static Tetromino[] PiecesPool { get; } =
    [
-        //making an array of arrays,
-        //for the blocks center point is (0,0) based on x, y coordinates
-        //so for example in the square piece, (0,0) is the first block
-        //(1,0) is describing one block to the right on the x axis
-        //(0,1) is describing one block directly above on the y axis
-        //(1,1) describes a block one to the right and one up
-
-        [(0,0), (1,0), (0,1), (1,1)], //square
-
-        [(0,0), (-1,0), (1,0), (2,0)], //long
-
-        [(0,0), (-1,0), (1,0), (0,1)], //t piece
-
-        [(0,0), (-1,0), (1,0), (1,1)], //j block
-
-        [(0,0), (-1,0), (1,0), (-1,1)], //l block
-
-        [(0,0), (-1,0), (1, 0), (0, 1)], //The blarg (supposed to make you say "blarg" in anger)
+        new("Square",
+            [new(0,0), new(1,0), new(0, 1), new(1, 1)],
+            ConsoleColor.Yellow),
+        new("Long",
+            [new(0, 0), new(-1, 0), new(1, 0), new(2, 0)],
+            ConsoleColor.Cyan),
+        new("T Block",
+            [new(0, 0), new(-1, 0), new(1, 0), new(0, 1)],
+            ConsoleColor.Magenta),
+        new("J Block",
+            [new(0, 0), new(-1, 0), new(1, 0), new(1, 1)],
+            ConsoleColor.Blue),
+        new("L Block",
+            [new(0, 0), new(-1, 0), new(1, 0), new(-1, 1)],
+            ConsoleColor.DarkYellow),
+        new("Blarg",
+            [new(0, 0), new(-1, 0), new(1, 0), new(0, 1)],
+            ConsoleColor.Green),
     ];
 
-    public static ConsoleColor[] PieceColors { get; } =
-    [
-    ConsoleColor.Yellow,
-    ConsoleColor.Cyan,
-    ConsoleColor.Magenta,
-    ConsoleColor.Blue,
-    ConsoleColor.DarkYellow,
-    ConsoleColor.Green,
-    ConsoleColor.Red
-    ];
-
-    private static (int x, int y)[] _currentPiece = [];
-    private static (int x, int y) _positionOfPiece;
+    private static Tetromino _currentPiece;
+    private static Position _positionOfPiece;
     private const int _boardWidth = 10, _boardHeight = 20;
     private static bool _gameOver;
-    private static int _currentPieceIndex;
 
-    public static bool CanMove(int dx, int dy)                     //couldn't figure this out on my own so I
-    {                                                       //found this part online.
-        foreach (var (px, py) in _currentPiece)              //defines the elements of each dimension of the piece(x or y)
-        {                                                   //to see if the piece is in play, if it is inside the gameboard
-            var x = _positionOfPiece.x + px + dx;
-            var y = _positionOfPiece.y + py + dy;
+    public static bool CanMove(int dx, int dy)
+    {
+        foreach (var p in _currentPiece.Postions)
+        {
+            var x = _positionOfPiece.X + p.X + dx;
+            var y = _positionOfPiece.Y + p.Y + dy;
             if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
@@ -57,22 +45,19 @@ public static class Tetrominos
                                         //and positions it at the top and center of the board
                                         //if it hits zero it starts over
     {
-        _currentPieceIndex = Random.Shared.Next(PiecesPool.Length);
-        _currentPiece = PiecesPool[_currentPieceIndex];
-        _positionOfPiece = (_boardWidth / 2, 0);
+        _currentPiece = PiecesPool[Random.Shared.Next(PiecesPool.Length)];
+        _positionOfPiece = new(_boardWidth / 2, 0);
         if (!CanMove(0, 0)) _gameOver = true;
     }
 
-    private static void PlacePiece()                                                 //couldn't figure this out on my own
-                                                                                     //so I found this part online.
-    {                                                                           //basically changes pieces from active to set so nex piece can spawn, works by adding the current
-        var pieceColor = PieceColors[_currentPieceIndex];                    //pieces position (px/py = relative positions of each cell that makes up piece)
-                                                                            //to the game grid [y, x] when it reaches the bottom and marks the cell as occupied (1)
+    private static void PlacePiece()
+    {
+        var pieceColor = _currentPiece.Color;                    
 
-        foreach (var (px, py) in _currentPiece)
+        foreach (var p in _currentPiece.Postions)
         {
-            var x = _positionOfPiece.x + px;
-            var y = _positionOfPiece.y + py;
+            var x = _positionOfPiece.X + p.X;
+            var y = _positionOfPiece.Y + p.Y;
             if (y >= 0)
             {
                 Grid.NewGrid[y, x] = 1;
@@ -85,8 +70,8 @@ public static class Tetrominos
     {                                                   //if it CanMove, it accepts inputs and adds them to change the position of the piece (dx = horizontal movement of piece, dy vertical movement of piece)
         if (CanMove(dx, dy))                            //if not, it places the piece, checks for full rows, then initiates a new piece
         {
-            _positionOfPiece.x += dx;
-            _positionOfPiece.y += dy;
+            _positionOfPiece.X += dx;
+            _positionOfPiece.Y += dy;
         }
         else if (dy > 0)
         {
@@ -96,12 +81,12 @@ public static class Tetrominos
         }
     }
 
-    public static bool CanRotate((int x, int y)[] rotatedPiece)
+    public static bool CanRotate(Position[] rotatedPiece)
     {
         foreach (var (px, py) in rotatedPiece)
         {
-            var x = _positionOfPiece.x + px;
-            var y = _positionOfPiece.y + py;
+            var x = _positionOfPiece.X + px;
+            var y = _positionOfPiece.Y + py;
             if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
@@ -110,12 +95,12 @@ public static class Tetrominos
 
     public static void RotatePiece()
     {
-        var rotatedPiece = _currentPiece
-            .Select(cell => (-cell.y, cell.x))
+        var rotatedPiece = _currentPiece.Postions
+            .Select(cell => new Position(-cell.Y, cell.X))
             .ToArray();
 
         if (CanRotate(rotatedPiece))
-            _currentPiece = rotatedPiece;
+            _currentPiece = new(_currentPiece.Name, rotatedPiece, _currentPiece.Color);
     }
 
     private static void DrawBorder()
@@ -157,12 +142,12 @@ public static class Tetrominos
                 var isPiece = false;
                 var color = ConsoleColor.White;
 
-                foreach (var (px, py) in _currentPiece)
+                foreach (var p in _currentPiece.Postions)
                 {
-                    if (_positionOfPiece.x + px == x && _positionOfPiece.y + py == y)
+                    if (_positionOfPiece.X + p.X == x && _positionOfPiece.Y + p.Y == y)
                     {
                         isPiece = true;
-                        color = PieceColors[_currentPieceIndex];
+                        color = _currentPiece.Color;
                         break;
                     }
                 }

@@ -17,7 +17,7 @@ public static class Program
 
     public static void Main()
     {
-        PlayBackgroundMusic();
+        PlayRandomSong();
 
         string? input;
         Tetrominos.NewPiece();
@@ -63,18 +63,6 @@ public static class Program
             }
         }
         SetCursorPosition(0, 0);
-    }
-
-    private static void PlayBackgroundMusic()
-    {
-        try
-        {
-            PlayRandomSong();
-        }
-        catch (Exception ex)
-        {
-            WriteLine($"Error playing sound: {ex.Message}");
-        }
     }
 
     private static void PlayRandomSong()
