@@ -1,36 +1,31 @@
-﻿using System.Drawing;
-using System.Threading.Tasks.Sources;
+﻿namespace Tetris.blocks;
 
-namespace Tetris;
-
-public class Tetrominos
+public static class Tetrominos
 {
-
-    public static (int x, int y)[][] piecesPool = new (int, int)[][]
-   {
+    public static (int x, int y)[][] PiecesPool { get; } =
+   [
         //making an array of arrays,
         //for the blocks center point is (0,0) based on x, y coordinates
         //so for example in the square piece, (0,0) is the first block
         //(1,0) is describing one block to the right on the x axis
         //(0,1) is describing one block directly above on the y axis
         //(1,1) describes a block one to the right and one up
-        
-        new [] { (0,0), (1,0), (0,1), (1,1) }, //square
-                    
-        
-        new [] { (0,0), (-1,0), (1,0), (2,0) }, //long
-        
-        new [] { (0,0), (-1,0), (1,0), (0,1) }, //t piece
-        
-        new [] { (0,0), (-1,0), (1,0), (1,1) }, //j block
-        
-        new [] { (0,0), (-1,0), (1,0), (-1,1) }, //l block
-        
-        new[] { (0,0), (-1,0), (1, 0), (0, 1) }, //The blarg (supposed to make you say "blarg" in anger)
-    };
 
-    public static ConsoleColor[] pieceColors =
-    {
+        [(0,0), (1,0), (0,1), (1,1)], //square
+
+        [(0,0), (-1,0), (1,0), (2,0)], //long
+
+        [(0,0), (-1,0), (1,0), (0,1)], //t piece
+
+        [(0,0), (-1,0), (1,0), (1,1)], //j block
+
+        [(0,0), (-1,0), (1,0), (-1,1)], //l block
+
+        [(0,0), (-1,0), (1, 0), (0, 1)], //The blarg (supposed to make you say "blarg" in anger)
+    ];
+
+    public static ConsoleColor[] PieceColors { get; } =
+    [
     ConsoleColor.Yellow,
     ConsoleColor.Cyan,
     ConsoleColor.Magenta,
@@ -38,23 +33,21 @@ public class Tetrominos
     ConsoleColor.DarkYellow,
     ConsoleColor.Green,
     ConsoleColor.Red
-    };
+    ];
 
+    private static (int x, int y)[] _currentPiece = [];
+    private static (int x, int y) _positionOfPiece;
+    private const int _boardWidth = 10, _boardHeight = 20;
+    private static bool _gameOver;
+    private static int _currentPieceIndex;
 
-    static (int x, int y)[] currentPiece;           //for pieces
-    static Random random = new Random();            //instatiating random object for pieces
-    static (int x, int y) positionOfPiece;                 //declares pieces poisiton on the gird
-    static int width = 10, height = 20;             //hight and width of gameboard
-    static bool gameOver = false;
-    static int currentPieceIndex;
-
-    public static bool CanMove(int dx, int dy)                     //couldn't figure this out on my own so I 
+    public static bool CanMove(int dx, int dy)                     //couldn't figure this out on my own so I
     {                                                       //found this part online.
-        foreach (var (px, py) in currentPiece)              //defines the elements of each dimension of the piece(x or y)
+        foreach (var (px, py) in _currentPiece)              //defines the elements of each dimension of the piece(x or y)
         {                                                   //to see if the piece is in play, if it is inside the gameboard
-            int x = positionOfPiece.x + px + dx;
-            int y = positionOfPiece.y + py + dy;
-            if (x < 0 || x >= width || y < 0 || y >= height || (y >= 0 && Grid.NewGrid[y, x] != 0))
+            var x = _positionOfPiece.x + px + dx;
+            var y = _positionOfPiece.y + py + dy;
+            if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
         return true;
@@ -64,23 +57,22 @@ public class Tetrominos
                                         //and positions it at the top and center of the board
                                         //if it hits zero it starts over
     {
-        currentPieceIndex = random.Next(piecesPool.Length);
-        currentPiece = piecesPool[currentPieceIndex];
-        positionOfPiece = ((width / 2), 0);
-        if (!CanMove(0, 0)) gameOver = true;
+        _currentPieceIndex = Random.Shared.Next(PiecesPool.Length);
+        _currentPiece = PiecesPool[_currentPieceIndex];
+        _positionOfPiece = (_boardWidth / 2, 0);
+        if (!CanMove(0, 0)) _gameOver = true;
     }
 
-    static void PlacePiece()                                                 //couldn't figure this out on my own
-                                                                             //so I found this part online. 
+    private static void PlacePiece()                                                 //couldn't figure this out on my own
+                                                                                     //so I found this part online.
     {                                                                           //basically changes pieces from active to set so nex piece can spawn, works by adding the current
+        var pieceColor = PieceColors[_currentPieceIndex];                    //pieces position (px/py = relative positions of each cell that makes up piece)
+                                                                            //to the game grid [y, x] when it reaches the bottom and marks the cell as occupied (1)
 
-        ConsoleColor pieceColor = pieceColors[currentPieceIndex];                    //pieces position (px/py = relative positions of each cell that makes up piece)
-                                                                                     //to the game grid [y, x] when it reaches the bottom and marks the cell as occupied (1)
-
-        foreach (var (px, py) in currentPiece)
+        foreach (var (px, py) in _currentPiece)
         {
-            int x = positionOfPiece.x + px;
-            int y = positionOfPiece.y + py;
+            var x = _positionOfPiece.x + px;
+            var y = _positionOfPiece.y + py;
             if (y >= 0)
             {
                 Grid.NewGrid[y, x] = 1;
@@ -93,26 +85,24 @@ public class Tetrominos
     {                                                   //if it CanMove, it accepts inputs and adds them to change the position of the piece (dx = horizontal movement of piece, dy vertical movement of piece)
         if (CanMove(dx, dy))                            //if not, it places the piece, checks for full rows, then initiates a new piece
         {
-            positionOfPiece.x += dx;
-            positionOfPiece.y += dy;
+            _positionOfPiece.x += dx;
+            _positionOfPiece.y += dy;
         }
         else if (dy > 0)
         {
             PlacePiece();
             Grid.ClearFullRows();
             NewPiece();
-
         }
     }
-
 
     public static bool CanRotate((int x, int y)[] rotatedPiece)
     {
         foreach (var (px, py) in rotatedPiece)
         {
-            int x = positionOfPiece.x + px;
-            int y = positionOfPiece.y + py;
-            if (x < 0 || x >= width || y < 0 || y >= height || (y >= 0 && Grid.NewGrid[y, x] != 0))
+            var x = _positionOfPiece.x + px;
+            var y = _positionOfPiece.y + py;
+            if (x < 0 || x >= _boardWidth || y < 0 || y >= _boardHeight || y >= 0 && Grid.NewGrid[y, x] != 0)
                 return false;
         }
         return true;
@@ -120,62 +110,59 @@ public class Tetrominos
 
     public static void RotatePiece()
     {
-        var rotatedPiece = currentPiece
+        var rotatedPiece = _currentPiece
             .Select(cell => (-cell.y, cell.x))
             .ToArray();
 
         if (CanRotate(rotatedPiece))
-            currentPiece = rotatedPiece;
+            _currentPiece = rotatedPiece;
     }
 
     private static void DrawBorder()
     {
-        int boardWidth = width;
-        int boardHeight = height;
+        const int startX = 0;
+        const int startY = 0;
 
-        int startX = 0; 
-        int startY = 0; 
+        ForegroundColor = ConsoleColor.White;
 
-        Console.ForegroundColor = ConsoleColor.White; 
+        SetCursorPosition(startX, startY);
+        Write("╔" + new string('═', _boardWidth) + "╗");
 
-        Console.SetCursorPosition(startX, startY);
-        Console.Write("╔" + new string('═', boardWidth) + "╗");
-
-        for (int i = 0; i < boardHeight; i++)
+        for (var i = 0; i < _boardHeight; i++)
         {
-            Console.SetCursorPosition(startX, startY + i + 1);
-            Console.Write("║");
-            Console.SetCursorPosition(startX + boardWidth + 1, startY + i + 1);
-            Console.Write("║");
+            SetCursorPosition(startX, startY + i + 1);
+            Write("║");
+            SetCursorPosition(startX + _boardWidth + 1, startY + i + 1);
+            Write("║");
         }
 
-        Console.SetCursorPosition(startX, startY + boardHeight + 1);
-        Console.Write("╚" + new string('═', boardWidth) + "╝");
+        SetCursorPosition(startX, startY + _boardHeight + 1);
+        Write("╚" + new string('═', _boardWidth) + "╝");
 
-        Console.ResetColor(); 
+        ResetColor();
     }
 
     public static void DrawBoard()                  //wrote about half of this, got some help with the part that determines where the piece is.
                                                     //this draws the gameboard and checks if the grid is currently occupied by a piece
     {
         DrawBorder();
-        Console.SetCursorPosition(0, 0);
+        SetCursorPosition(0, 0);
 
-        for (int y = 0; y < height; y++)            //uses a bool to check cells for a piece, if it does it registers true it draws an x
+        for (var y = 0; y < _boardHeight; y++)            //uses a bool to check cells for a piece, if it does it registers true it draws an x
         {
-            Console.SetCursorPosition(1, y + 1); //otherwise it does . for empty space
-            for (int x = 0; x < width; x++)
+            SetCursorPosition(1, y + 1); //otherwise it does . for empty space
+            for (var x = 0; x < _boardWidth; x++)
 
             {
-                bool isPiece = false;
-                ConsoleColor color = ConsoleColor.White;
+                var isPiece = false;
+                var color = ConsoleColor.White;
 
-                foreach (var (px, py) in currentPiece)
+                foreach (var (px, py) in _currentPiece)
                 {
-                    if (positionOfPiece.x + px == x && positionOfPiece.y + py == y)
+                    if (_positionOfPiece.x + px == x && _positionOfPiece.y + py == y)
                     {
                         isPiece = true;
-                        color = pieceColors[currentPieceIndex];
+                        color = PieceColors[_currentPieceIndex];
                         break;
                     }
                 }
@@ -183,78 +170,69 @@ public class Tetrominos
                 if (!isPiece && Grid.NewGrid[y, x] != 0)
                     color = Grid.ColorGrid[y, x];
 
-                Console.ForegroundColor = color;
-                Console.Write(isPiece || Grid.NewGrid[y, x] != 0 ? "X" : ".");
-
+                ForegroundColor = color;
+                Write(isPiece || Grid.NewGrid[y, x] != 0 ? "X" : ".");
             }
 
-            Console.WriteLine();
-
-
+            WriteLine();
         }
-        int textX = width + 4;
-        int textY = 2;
-        Console.ResetColor();
-        Console.WriteLine();
-        Console.WriteLine($"  Score: {Grid.score}");
-        Console.WriteLine("    _._     _,-'\"\"`-._\r\n     (,-.`._,'(       |\\`-/|\r\n         `-.-' \\ )-`( , o o)\r\n             `-    \\`_`\"'-");
+        const int textX = _boardWidth + 4;
+        const int textY = 2;
+        ResetColor();
+        WriteLine();
+        WriteLine($"  Score: {Grid.Score}");
+        WriteLine("    _._     _,-'\"\"`-._\r\n     (,-.`._,'(       |\\`-/|\r\n         `-.-' \\ )-`( , o o)\r\n             `-    \\`_`\"'-");
 
-        Console.SetCursorPosition(textX, textY); if (Grid.score > 10)
+        SetCursorPosition(textX, textY); if (Grid.Score > 10)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Nice!");
-
+            ForegroundColor = ConsoleColor.Cyan;
+            WriteLine("Nice!");
         }
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.SetCursorPosition(textX, textY + 2); if (Grid.score > 20)
+        ForegroundColor = ConsoleColor.White;
+        SetCursorPosition(textX, textY + 2); if (Grid.Score > 20)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Great job!");
-        };
-        Console.ForegroundColor = ConsoleColor.White;
-
-        Console.SetCursorPosition(textX, textY + 4); if (Grid.score > 30)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Excellent!");
+            ForegroundColor = ConsoleColor.Green;
+            WriteLine("Great job!");
         }
-        Console.ForegroundColor = ConsoleColor.White;
 
-        Console.SetCursorPosition(textX, textY + 6); if (Grid.score > 40)
-        {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("Fantastic!");
-        }
-        Console.ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.White;
 
-        Console.SetCursorPosition(textX, textY + 8); if (Grid.score > 50)
+        SetCursorPosition(textX, textY + 4); if (Grid.Score > 30)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Increrdible!!");
+            ForegroundColor = ConsoleColor.Red;
+            WriteLine("Excellent!");
         }
-        Console.ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.White;
 
-        Console.SetCursorPosition(textX, textY + 10); if (Grid.score > 60)
+        SetCursorPosition(textX, textY + 6); if (Grid.Score > 40)
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("Out of this world!!");
+            ForegroundColor = ConsoleColor.Magenta;
+            WriteLine("Fantastic!");
         }
-        Console.ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.White;
+
+        SetCursorPosition(textX, textY + 8); if (Grid.Score > 50)
+        {
+            ForegroundColor = ConsoleColor.Yellow;
+            WriteLine("Increrdible!!");
+        }
+        ForegroundColor = ConsoleColor.White;
+
+        SetCursorPosition(textX, textY + 10); if (Grid.Score > 60)
+        {
+            ForegroundColor = ConsoleColor.Blue;
+            WriteLine("Out of this world!!");
+        }
+        ForegroundColor = ConsoleColor.White;
     }
 
-
-    
-
-    public static bool pause = false;
-
-
+    public static bool Pause { get; set; }
 
     public static void ReadInput()              //this is for inputs that determine how the piece move
     {                                           //currently i have an up input just so i can play around with it
-        while (!gameOver)                       //later i'll change that
+        while (!_gameOver)                       //later i'll change that
         {
-            var key = Console.ReadKey(true).Key;
-
+            var key = ReadKey(true).Key;
 
             if (key == ConsoleKey.LeftArrow) MovePiece(-1, 0);
             if (key == ConsoleKey.RightArrow) MovePiece(1, 0);
@@ -262,37 +240,34 @@ public class Tetrominos
             if (key == ConsoleKey.UpArrow) RotatePiece();
             if (key == ConsoleKey.Spacebar)
             {
-                pause = !pause;
-                Console.Clear();
-                Console.WriteLine("           P A U S E ");
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine("======== TETRIS CONTROLS ========");
-                Console.WriteLine("⬅  Left Arrow      - Move left ");
-                Console.WriteLine("➡  Right Arrow     - Move right ");
-                Console.WriteLine("⬇  Down Arrow      - Soft drop  ");
-                Console.WriteLine("⬆  Up Arrow        - Rotate piece  ");
-                Console.WriteLine("Spacebar           - P A U S E");
-                Console.WriteLine("=================================");
-                Console.WriteLine(". . . . . . .");
-                Console.WriteLine();
-                Console.WriteLine($"  Score: {Grid.score}");
-                Console.WriteLine("    _._     _,-'\"\"`-._\r\n     (,-.`._,'(       |\\`-/|\r\n         `-.-' \\ )-`( , o o)\r\n             `-    \\`_`\"'-");
-
+                Pause = !Pause;
+                Clear();
+                WriteLine("           P A U S E ");
+                WriteLine();
+                WriteLine();
+                WriteLine("======== TETRIS CONTROLS ========");
+                WriteLine("⬅  Left Arrow      - Move left ");
+                WriteLine("➡  Right Arrow     - Move right ");
+                WriteLine("⬇  Down Arrow      - Soft drop  ");
+                WriteLine("⬆  Up Arrow        - Rotate piece  ");
+                WriteLine("Spacebar           - P A U S E");
+                WriteLine("=================================");
+                WriteLine(". . . . . . .");
+                WriteLine();
+                WriteLine($"  Score: {Grid.Score}");
+                WriteLine("    _._     _,-'\"\"`-._\r\n     (,-.`._,'(       |\\`-/|\r\n         `-.-' \\ )-`( , o o)\r\n             `-    \\`_`\"'-");
 
                 while (true)
                 {
-                    var resumeKey = Console.ReadKey(true).Key;
+                    var resumeKey = ReadKey(true).Key;
                     if (resumeKey == ConsoleKey.Spacebar)
                     {
-                        pause = false;
-                        Console.Clear();
+                        Pause = false;
+                        Clear();
                         break;
                     }
                 }
             }
-            
         }
     }
 }
-

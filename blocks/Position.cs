@@ -1,17 +1,8 @@
-﻿namespace Tetris
+﻿namespace Tetris.blocks;
+
+public struct Position(int height, int width)
 {
-    public class Position 
-    {
-        public int Height { get; set; }
-    
-        public int Width { get; set; }
+    public int Height { get; set; } = height;
 
-        public Position(int height, int width)
-        {
-            Height = height;
-            Width = width;
-        } 
-        
-    }
+    public int Width { get; set; } = width;
 }
-
